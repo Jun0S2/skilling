@@ -34,13 +34,18 @@ void LOGD() {
 
 /**
  * Get Input from user
+ * Add try-catch to avoid vector[outofarraybound]
 */
 void Input() {
     cin>>N>>M>>V;
     int temp1{0}, temp2{0}; 
     for(auto i  = 0 ; i < M ; i++) {
         cin>>temp1>>temp2;
-        map[temp1][temp2] = map[temp2][temp1] = true;
+        try {
+            map[temp1][temp2] = map[temp2][temp1] = true;
+        } catch(const std::exception& e) {
+            cerr << "Input number is out of range" << e.what() << '\n';
+        }
     }
 }
 
