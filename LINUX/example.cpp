@@ -5,12 +5,15 @@
 #include <sys/epoll.h>
 #include <sys/inotify.h>
 #include <unistd.h>
+#include <limits.h>
 
 #define MAX_EVENTS 10
 
 int main() {
+    // path
     const char* monitor_path = "/sys/kernel/example"; // mechanism to monitor the specified path for new files
 
+    // NONBLOCK -> EDGE EVENT
     int inotify_fd = inotify_init1(IN_NONBLOCK);
     if (inotify_fd == -1) {
         std::cerr << "Failed to initialize inotify." << std::endl;
@@ -77,17 +80,6 @@ int main() {
                     // print the file content before parsing
                     std::cout << "File Content:\n" << content << std::endl;
 
-                    // Parse content and save as JSON
-                    Json::Value json_content;
-                    Json::CharReaderBuilder json_reader;
-                    std::istringstream content_stream(content);
-                    std::string json_parse_errors;
-
-                    if (!Json::parseFromStream(json_reader, content_stream, &json_content, &json_parse_errors)) {
-                        std::cerr << "JSON parsing error: " << json_parse_errors << std::endl;
-                        continue;
-                    }
-
                     // Remove the file
                     if (remove(filepath.c_str()) != 0) {
                         std::cerr << "Failed to remove file: " << filepath << std::endl;
@@ -95,8 +87,7 @@ int main() {
                         std::cout << "File processed and removed: " << filepath << std::endl;
                     }
 
-                    // Do something with the JSON data (printing it here)
-                    std::cout << "JSON Content:\n" << json_content.toStyledString() << std::endl;
+            
                 }
             }
         }
